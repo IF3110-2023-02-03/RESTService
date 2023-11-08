@@ -1,0 +1,41 @@
+services:
+  rest-api:
+    build: .
+    ports:
+      - 3000:3000
+    hostname: api-moments-rest-service
+    env_file: .env
+    volumes:
+      - ./:/app
+      - /app/node_modules
+    depends_on:
+      - postgresql
+      - redis
+    networks:
+      - api-postgresql-redis
+  postgresql:
+    image: postgres:latest
+    ports:
+      - 5433:5432
+    hostname: db-moments-rest-service
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - ./postgresql:/var/lib/postgresql/data
+    networks:
+      - api-postgresql-redis
+  redis:
+    image: redis:latest
+    restart: always
+    ports:
+      - 6380:6379
+    hostname: cache-moments-rest-service
+    volumes:
+      - ./redis:/data
+    networks:
+      - api-postgresql-redis
+networks:
+  api-postgresql-redis:
+    driver: bridge
