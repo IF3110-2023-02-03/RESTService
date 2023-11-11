@@ -35,7 +35,7 @@ export class UserController {
             }
 
             const user = await User.createQueryBuilder("user")
-                .select(["user.userID", "user.password", "user.isAdmin"])
+                .select(["user.userID", "user.password"])
                 .where("user.username = :username", { username })
                 .getOne();
             if (!user) {
@@ -53,10 +53,9 @@ export class UserController {
                 return;
             }
 
-            const { userID, isAdmin } = user;
+            const { userID } = user;
             const payload: AuthToken = {
                 userID,
-                isAdmin,
             };
             const token = jwt.sign(payload, jwtConfig.secret, {
                 expiresIn: jwtConfig.expiresIn,
@@ -65,6 +64,7 @@ export class UserController {
             res.status(StatusCodes.OK).json({
                 message: ReasonPhrases.OK,
                 token,
+                userID,
             });
         };
     }
@@ -84,7 +84,6 @@ export class UserController {
             user.username = username;
             user.fullname = fullname;
             user.password = password;
-            user.isAdmin = false;
 
             // Cek apakah data sudah ada ...
             const existingUserWithUsername = await User.findOneBy({
@@ -115,10 +114,9 @@ export class UserController {
                 return;
             }
 
-            const { userID, isAdmin } = newUser;
+            const { userID} = newUser;
             const payload: AuthToken = {
                 userID,
-                isAdmin,
             };
             const token = jwt.sign(payload, jwtConfig.secret, {
                 expiresIn: jwtConfig.expiresIn,
@@ -136,7 +134,6 @@ export class UserController {
 
             const users = await User.createQueryBuilder("user")
                 .select(["user.userID", "user.fullname"])
-                .where("user.isAdmin = :isAdmin", { isAdmin: false })
                 .cache(
                     `creator`,
                     cacheConfig.cacheExpirationTime
@@ -146,20 +143,6 @@ export class UserController {
             res.status(StatusCodes.OK).json({
                 message: ReasonPhrases.OK,
                 data: users
-            });
-        };
-    }
-
-    admin() {
-        return async (req: Request, res: Response) => {
-
-            const admin = await User.findOneBy({
-                isAdmin: true,
-            });
-
-            res.status(StatusCodes.OK).json({
-                message: ReasonPhrases.OK,
-                data: admin,
             });
         };
     }
@@ -175,8 +158,7 @@ export class UserController {
             }
 
             res.status(StatusCodes.OK).json({
-                userID: token.userID,
-                isAdmin: token.isAdmin,
+                userID: token.userID
             });
         };
     }

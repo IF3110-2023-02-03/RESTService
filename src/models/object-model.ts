@@ -11,7 +11,7 @@ import { Comment } from "./comment-model";
 import { Like } from "./like-model";
 
 @Entity()
-export class Object extends BaseEntity {
+export class Objects extends BaseEntity {
   @PrimaryGeneratedColumn()
   objectID: number;
 
@@ -19,7 +19,7 @@ export class Object extends BaseEntity {
   user: User;
 
   @Column()
-  title: string;
+  description: string;
 
   @Column({
     type: "enum",
@@ -28,28 +28,13 @@ export class Object extends BaseEntity {
   type: string;
 
   @Column({ nullable: true })
-  url_photo: string;
-
-  @Column({ nullable: true })
-  url_video: string;
-
-  @Column()
-  isPublic: boolean;
+  url: string;
 
   @Column("date")
   date: string;
 
-  @Column()
-  location: string;
-
-  @Column()
-  description: string;
-
-  @Column({ type: "datetime" })
-  post_date: string;
-
-  @Column()
-  size: bigint;
+  @Column({ type: "timestamp" })
+  post_date: Date;
 
   @OneToMany(() => Comment, (comment) => comment.object)
   comments: Comment[];

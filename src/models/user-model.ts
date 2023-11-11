@@ -5,7 +5,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { Object } from "./object-model";
+import { Objects } from "./object-model";
 import { Comment } from "./comment-model";
 import { Like } from "./like-model";
 
@@ -30,19 +30,8 @@ export class User extends BaseEntity {
   @Column()
   password: string;
 
-  @Column({
-    default: false,
-  })
-  isAdmin: boolean;
-
-  @Column()
-  storage: bigint;
-
-  @Column()
-  storage_left: bigint;
-
-  @OneToMany(() => Object, (object) => object.user)
-  objects: Object[];
+  @OneToMany(() => Objects, (object) => object.user)
+  objects: Objects[];
 
   @OneToMany(() => Comment, (comment) => comment.user)
   comments: Comment[];

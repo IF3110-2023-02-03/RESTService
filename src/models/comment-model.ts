@@ -1,14 +1,24 @@
 import { BaseEntity, Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "./user-model";
-import { Object } from "./object-model";
+import { Objects } from "./object-model";
+import { Broadcast } from "./broadcast-model";
 
 @Entity()
 export class Comment extends BaseEntity {
   @PrimaryGeneratedColumn()
   commentID: number;
 
-  @ManyToOne(() => Object, (object) => object.comments)
-  object: Object;
+  @Column({
+    type: "enum",
+    enum: ["Broadcast", "Objects"],
+  })
+  type: string;
+
+  @ManyToOne(() => Objects, (object) => object.comments)
+  object: Objects;
+
+  @ManyToOne(() => Broadcast, (bc) => bc.comments)
+  bc: Broadcast;
 
   @ManyToOne(() => User, (user) => user.comments)
   user: User;

@@ -24,9 +24,5 @@ export class UserRoute {
                 this.authenticationMiddleware.authenticate(),
                 this.userController.check()
             )
-            .get(
-                "/user/admin",
-                this.userController.admin()
-            )
     }
 }

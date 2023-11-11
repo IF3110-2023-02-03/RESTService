@@ -22,7 +22,7 @@ export class SoapController {
   accept() {
     return async (req: Request, res: Response) => {
       const { token } = req as AuthRequest;
-      if (!token || !token.isAdmin) {
+      if (!token) {
         res.status(StatusCodes.UNAUTHORIZED).json({
           message: ReasonPhrases.UNAUTHORIZED,
         });
@@ -83,8 +83,7 @@ export class SoapController {
   reject() {
     return async (req: Request, res: Response) => {
       const { token } = req as AuthRequest;
-      if (!token || !token.isAdmin) {
-        // Endpoint hanya bisa diakses oleh admin
+      if (!token) {
         res.status(StatusCodes.UNAUTHORIZED).json({
           message: ReasonPhrases.UNAUTHORIZED,
         });
@@ -145,8 +144,7 @@ export class SoapController {
   index() {
     return async (req: Request, res: Response) => {
       const { token } = req as AuthRequest;
-      if (!token || !token.isAdmin) {
-        // Endpoint hanya bisa diakses oleh admin
+      if (!token) {
         res.status(StatusCodes.UNAUTHORIZED).json({
           message: ReasonPhrases.UNAUTHORIZED,
         });

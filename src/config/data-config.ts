@@ -1,7 +1,10 @@
 import { DataSourceOptions } from "typeorm";
 
 import { User } from "../models/user-model";
-import { Object } from "../models/object-model";
+import { Objects } from "../models/object-model";
+import { Comment } from "../models/comment-model";
+import { Broadcast } from "../models/broadcast-model";
+import { Like } from "../models/like-model";
 import { UserFollower } from "../follower/user-follower";
 
 const generatePostgreHost = () => {
@@ -52,7 +55,7 @@ export const dataConfig: DataSourceOptions = {
   },
   synchronize: true,
   logging: true,
-  entities: [User, Object],
-  follower: [UserFollower],
+  entities: [User, Objects, Comment, Like, Broadcast],
+  subscribers: [UserFollower],
   migrations: [],
 };
