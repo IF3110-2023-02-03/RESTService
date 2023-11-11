@@ -109,5 +109,3 @@ dist
 # Docker
 postgresql/
 redis/
-
-storage/**
