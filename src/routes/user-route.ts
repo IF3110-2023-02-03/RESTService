@@ -20,6 +20,7 @@ export class UserRoute {
             .post("/broadcast", this.userController.addBroadcast())
             .get("/broadcast", this.userController.getBroadcast())
             .put("/broadcast", this.userController.updateBroadcast())
+            .delete("/broadcast/:id", this.userController.deleteBroadcast())
             .get(
                 "/user/check", 
                 this.authenticationMiddleware.authenticate(),
