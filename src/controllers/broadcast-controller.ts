@@ -8,6 +8,10 @@ import { Broadcast } from "../models/broadcast-model";
 export class BroadcastController {
     userController: UserController;
 
+    constructor() {
+        this.userController = new UserController();
+    }
+
     addBroadcast() {
         return async (req: Request, res: Response) => {
             this.userController.check();
