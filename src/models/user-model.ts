@@ -8,6 +8,7 @@ import {
 import { Objects } from "./object-model";
 import { Comment } from "./comment-model";
 import { Like } from "./like-model";
+import { Broadcast } from "./broadcast-model";
 
 @Entity()
 export class User extends BaseEntity {
@@ -32,6 +33,9 @@ export class User extends BaseEntity {
 
   @OneToMany(() => Objects, (object) => object.user)
   objects: Objects[];
+
+  @OneToMany(() => Broadcast, (bc) => bc.user)
+  bc: Objects[];
 
   @OneToMany(() => Comment, (comment) => comment.user)
   comments: Comment[];

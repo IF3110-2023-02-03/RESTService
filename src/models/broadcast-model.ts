@@ -15,22 +15,19 @@ import {
     @PrimaryGeneratedColumn()
     objectID: number;
   
-    @ManyToOne(() => User, (user) => user.objects)
+    @ManyToOne(() => User, (user) => user.bc)
     user: User;
   
     @Column()
     description: string;
   
-    @Column("date")
-    date: string;
-  
     @Column({ type: "timestamp" })
     post_date: Date;
   
-    @OneToMany(() => Comment, (comment) => comment.object)
+    @OneToMany(() => Comment, (comment) => comment.bc)
     comments: Comment[];
   
-    @OneToMany(() => Like, (like) => like.object)
+    @OneToMany(() => Like, (like) => like.bc)
     likes: Like[];
   }
   
