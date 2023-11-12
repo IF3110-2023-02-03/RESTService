@@ -84,6 +84,8 @@ export class UserController {
             user.username = username;
             user.fullname = fullname;
             user.password = password;
+            user.description = "";
+            user.pp_url = "";
 
             // Cek apakah data sudah ada ...
             const existingUserWithUsername = await User.findOneBy({
@@ -114,7 +116,7 @@ export class UserController {
                 return;
             }
 
-            const { userID} = newUser;
+            const { userID } = newUser;
             const payload: AuthToken = {
                 userID,
             };
