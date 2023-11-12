@@ -16,11 +16,9 @@ export class UserRoute {
         return Router()
             .post("/user/token", this.userController.token())
             .post("/user", this.userController.store())
+            .put("/user", this.userController.update())
             .get("/user", this.userController.index())
-            .post("/broadcast", this.userController.addBroadcast())
-            .get("/broadcast", this.userController.getBroadcast())
-            .put("/broadcast", this.userController.updateBroadcast())
-            .delete("/broadcast/:id", this.userController.deleteBroadcast())
+            .get("/user/info", this.userController.info())
             .get(
                 "/user/check", 
                 this.authenticationMiddleware.authenticate(),
