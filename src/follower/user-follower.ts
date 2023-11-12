@@ -21,16 +21,4 @@ export class UserFollower implements EntitySubscriberInterface<User> {
             bcryptConfig.saltRounds
         );
     }
-
-    async beforeUpdate(event: UpdateEvent<User>) {
-        if (
-            event.entity &&
-            event.entity.password !== event.databaseEntity.password
-        ) {
-            event.entity.password = await bcrypt.hash(
-                event.entity.password,
-                bcryptConfig.saltRounds
-            );
-        }
-    }
 }
