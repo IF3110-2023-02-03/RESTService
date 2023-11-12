@@ -34,16 +34,17 @@ export class SoapController {
 
       try {
         const response = await axios.post<string>(
-          `http://${soapConfig.host}:${soapConfig.port}/api/follow`,
+          `http://${soapConfig.host}:${soapConfig.port}/api/following`,
           `<Envelope xmlns="http://schemas.xmlsoap.org/soap/envelope/">
-                        <Body>
-                            <approveFollow xmlns="http://service.moments/">
-                                <arg0 xmlns="">${creatorID}</arg0>
-                                <arg1 xmlns="">${followerID}</arg1>
-                                <arg2 xmlns="">${soapConfig.key}</arg2>
-                            </approveFollow>
-                        </Body>
-                    </Envelope>`,
+              <Body>
+                  <confirmFollow xmlns="http://services.example.org/">
+                      <arg0 xmlns="">${creatorID}</arg0>
+                      <arg1 xmlns="">${followerID}</arg1>
+                      <arg2 xmlns="">true</arg2>
+                      <arg3 xmlns="">${soapConfig.key}</arg3>
+                  </confirmFollow>
+              </Body>
+          </Envelope>`,
           {
             headers: {
               "Content-Type": "text/xml",
@@ -52,7 +53,7 @@ export class SoapController {
         );
         const xml = await xml2js.parseStringPromise(response.data);
         const result =
-          xml["S:Envelope"]["S:Body"][0]["ns2:approveFollowResponse"][0]
+          xml["S:Envelope"]["S:Body"][0]["ns2:confirmFollowResponse"][0]
             .return[0];
 
         if (result === "Follow not found") {
@@ -60,7 +61,7 @@ export class SoapController {
             message: result,
           });
           return;
-        } else if (result === "Follow accepted") {
+        } else if (result === "Success") {
           res.status(StatusCodes.OK).json({
             message: result,
           });
@@ -95,14 +96,15 @@ export class SoapController {
 
       try {
         const response = await axios.post<string>(
-          `http://${soapConfig.host}:${soapConfig.port}/api/follow`,
+          `http://${soapConfig.host}:${soapConfig.port}/api/following`,
           `<Envelope xmlns="http://schemas.xmlsoap.org/soap/envelope/">
                         <Body>
-                            <rejectFollow xmlns="http://service.moments/">
+                            <confirmFollow xmlns="http://services.example.org/">
                                 <arg0 xmlns="">${creatorID}</arg0>
                                 <arg1 xmlns="">${followerID}</arg1>
-                                <arg2 xmlns="">${soapConfig.key}</arg2>
-                            </rejectFollow>
+                                <arg2 xmlns="">false</arg2>
+                                <arg3 xmlns="">${soapConfig.key}</arg3>
+                            </confirmFollow>
                         </Body>
                     </Envelope>`,
           {
@@ -113,10 +115,10 @@ export class SoapController {
         );
         const xml = await xml2js.parseStringPromise(response.data);
         const result =
-          xml["S:Envelope"]["S:Body"][0]["ns2:rejectFollowResponse"][0]
+          xml["S:Envelope"]["S:Body"][0]["ns2:confirmFollowResponse"][0]
             .return[0];
 
-        if (result === "Follow not found") {
+        if (result === "Success") {
           res.status(StatusCodes.NOT_FOUND).json({
             message: result,
           });
@@ -153,17 +155,19 @@ export class SoapController {
 
       const page = parseInt((req.query?.page || "1") as string);
       const pageSize = parseInt((req.query?.pageSize || "5") as string);
+      const id = req.query?.id
       let followData: FollowData[] = [];
       try {
         const response = await axios.post<string>(
-          `http://${soapConfig.host}:${soapConfig.port}/api/follow`,
+          `http://${soapConfig.host}:${soapConfig.port}/api/following`,
           `<Envelope xmlns="http://schemas.xmlsoap.org/soap/envelope/">
                         <Body>
-                            <getAllReqFollow xmlns="http://service.moments/">
-                                <arg0 xmlns="">${page}</arg0>
-                                <arg1 xmlns="">${pageSize}</arg1>
-                                <arg2 xmlns="">${soapConfig.key}</arg2>
-                            </getAllReqFollow>
+                            <getFollowersByID xmlns="http://services.example.org/">
+                              <arg0 xmlns="">${id}</arg0>
+                              <arg1 xmlns="">${page}</arg1>
+                              <arg2 xmlns="">${pageSize}</arg2>
+                              <arg3 xmlns="">${soapConfig.key}</arg3>
+                            </getFollowersByID>
                         </Body>
                     </Envelope>`,
           {
@@ -173,45 +177,71 @@ export class SoapController {
           }
         );
         const xml = await xml2js.parseStringPromise(response.data);
-        const pageCount =
-          xml["S:Envelope"]["S:Body"][0]["ns2:getAllReqFollowResponse"][0]
-            .return[0].pageCount[0];
-        if (pageCount === "0") {
-          res.status(StatusCodes.OK).json({
-            message: "No follow request found",
-            data: followData,
-            pageCount: pageCount,
-          });
-          return;
-        }
         const results =
-          xml["S:Envelope"]["S:Body"][0]["ns2:getAllReqFollowResponse"][0]
-            .return[0].data;
+          xml["S:Envelope"]["S:Body"][0]["ns2:getFollowersByIDResponse"][0]
+            .return[0];
 
         if (!results) {
           res.status(StatusCodes.OK).json({
             message: ReasonPhrases.OK,
-            data: [],
-            totalPage: pageCount,
+            data: JSON.parse(results),
           });
           return;
         }
-
-        results.forEach((result: any) => {
-          followData.push({
-            creatorID: result.creatorID[0],
-            followerID: result.followerID[0],
-            creatorName: result.creatorName[0],
-            followerName: result.followerName[0],
-          });
-        });
-
-        res.status(StatusCodes.OK).json({
-          message: ReasonPhrases.OK,
-          data: followData,
-          totalPage: pageCount,
+      } catch (error) {
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+          message: ReasonPhrases.INTERNAL_SERVER_ERROR,
         });
         return;
+      }
+    };
+  }
+
+  indexPending() {
+    return async (req: Request, res: Response) => {
+      const { token } = req as AuthRequest;
+      if (!token) {
+        res.status(StatusCodes.UNAUTHORIZED).json({
+          message: ReasonPhrases.UNAUTHORIZED,
+        });
+        return;
+      }
+
+      const page = parseInt((req.query?.page || "1") as string);
+      const pageSize = parseInt((req.query?.pageSize || "5") as string);
+      const id = req.query?.id
+      let followData: FollowData[] = [];
+      try {
+        const response = await axios.post<string>(
+          `http://${soapConfig.host}:${soapConfig.port}/api/following`,
+          `<Envelope xmlns="http://schemas.xmlsoap.org/soap/envelope/">
+              <Body>
+                  <getPendingFollowingsByID xmlns="http://services.example.org/">
+                      <arg0 xmlns="">${id}</arg0>
+                      <arg1 xmlns="">${page}</arg1>
+                      <arg2 xmlns="">${pageSize}</arg2>
+                      <arg3 xmlns="">${soapConfig.key}</arg3>
+                  </getPendingFollowingsByID>
+              </Body>
+          </Envelope>`,
+          {
+            headers: {
+              "Content-Type": "text/xml",
+            },
+          }
+        );
+        const xml = await xml2js.parseStringPromise(response.data);
+        const results =
+          xml["S:Envelope"]["S:Body"][0]["ns2:getFollowersByIDResponse"][0]
+            .return[0];
+
+        if (!results) {
+          res.status(StatusCodes.OK).json({
+            message: ReasonPhrases.OK,
+            data: JSON.parse(results),
+          });
+          return;
+        }
       } catch (error) {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
           message: ReasonPhrases.INTERNAL_SERVER_ERROR,

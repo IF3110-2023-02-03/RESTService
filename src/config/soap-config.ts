@@ -3,7 +3,7 @@ const generateHost = () => {
 };
 
 const generatePort = () => {
-    return process.env.SOAP_BASE_PORT ? +process.env.SOAP_BASE_PORT : 8001;
+    return process.env.SOAP_BASE_PORT ? +process.env.SOAP_BASE_PORT : 8000;
 };
 
 export const soapConfig: {host : string, port: number, key: string } = {
