@@ -9,7 +9,7 @@ export class SOAPService {
         `http://${soapConfig.host}:${soapConfig.port}/api/follow`,
         `<Envelope xmlns="http://schemas.xmlsoap.org/soap/envelope/">
                     <Body>
-                        <checkStatus xmlns="http://service.moments/">
+                        <checkStatus xmlns="http://service.spaces/">
                             <arg0 xmlns="">${creatorID}</arg0>
                             <arg1 xmlns="">${followerID}</arg1>
                             <arg2 xmlns="">${soapConfig.key}</arg2>

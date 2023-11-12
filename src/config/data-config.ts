@@ -26,7 +26,7 @@ const generatePostgrePassword = () => {
 };
 
 const generatePostgreDatabase = () => {
-  return process.env.POSTGRES_DB ? process.env.POSTGRES_DB : "moments_rest";
+  return process.env.POSTGRES_DB ? process.env.POSTGRES_DB : "spaces_rest";
 };
 
 const generateRedisHost = () => {

@@ -1,45 +1,45 @@
 {
-    "name": "moments-rest-service",
-    "version": "1.0.0",
-    "main": "index.js",
-    "repository": "https://github.com/IF3110-2023-02-03/RESTService.git",
-    "author": "ghaziakmalf <ghazi.rafi.fachry@gmail.com>",
-    "scripts": {
-      "build": "tsc --project ./",
-      "start:dev": "nodemon ./src/index.ts",
-      "start:prod": "node ./dist/index.js"
-    },
-    "devDependencies": {
-      "@types/cors": "^2.8.16",
-      "@types/express": "^4.17.21",
-      "@types/jquery": "^3.5.27",
-      "@types/multer": "^1.4.10",
-      "@types/node": "^20.9.0",
-      "@types/xml2js": "^0.4.14",
-      "nodemon": "^3.0.1",
-      "ts-node": "^10.9.1",
-      "typescript": "^5.2.2"
-    },
-    "dependencies": {
-      "@types/bcrypt": "^5.0.2",
-      "@types/jsonwebtoken": "^9.0.5",
-      "@types/morgan": "^1.9.9",
-      "@types/uuid": "^9.0.7",
-      "axios": "^1.6.1",
-      "bcrypt": "^5.1.1",
-      "cors": "^2.8.5",
-      "express": "^4.18.2",
-      "http-status-codes": "^2.3.0",
-      "jquery": "^3.7.1",
-      "jsonwebtoken": "^9.0.2",
-      "morgan": "^1.10.0",
-      "multer": "^1.4.5-lts.1",
-      "node-fetch": "^3.3.2",
-      "pg": "^8.11.3",
-      "redis": "^4.6.10",
-      "reflect-metadata": "^0.1.13",
-      "typeorm": "^0.3.17",
-      "uuid": "^9.0.1",
-      "xml2js": "^0.6.2"
-    }
+  "name": "spaces-rest-service",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/IF3110-2023-02-03/RESTService.git",
+  "author": "ghaziakmalf <ghazi.rafi.fachry@gmail.com>",
+  "scripts": {
+    "build": "tsc --project ./",
+    "start:dev": "nodemon ./src/index.ts",
+    "start:prod": "node ./dist/index.js"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.16",
+    "@types/express": "^4.17.21",
+    "@types/jquery": "^3.5.27",
+    "@types/multer": "^1.4.10",
+    "@types/node": "^20.9.0",
+    "@types/xml2js": "^0.4.14",
+    "nodemon": "^3.0.1",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/jsonwebtoken": "^9.0.5",
+    "@types/morgan": "^1.9.9",
+    "@types/uuid": "^9.0.7",
+    "axios": "^1.6.1",
+    "bcrypt": "^5.1.1",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "http-status-codes": "^2.3.0",
+    "jquery": "^3.7.1",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.1",
+    "node-fetch": "^3.3.2",
+    "pg": "^8.11.3",
+    "redis": "^4.6.10",
+    "reflect-metadata": "^0.1.13",
+    "typeorm": "^0.3.17",
+    "uuid": "^9.0.1",
+    "xml2js": "^0.6.2"
   }
+}
