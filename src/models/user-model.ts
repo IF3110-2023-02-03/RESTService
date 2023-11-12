@@ -31,6 +31,12 @@ export class User extends BaseEntity {
   @Column()
   password: string;
 
+  @Column({ nullable: true })
+  description: string;
+
+  @Column({ nullable: true })
+  pp_url: string;
+
   @OneToMany(() => Objects, (object) => object.user)
   objects: Objects[];
 
