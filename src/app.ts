@@ -7,6 +7,7 @@ import "reflect-metadata";
 import { serverConfig } from "./config/server-config";
 import { dataConfig } from "./config/data-config";
 import { UserRoute } from "./routes/user-route";
+import { BroadcastRoute } from "./routes/broadcast-route";
 import { SoapRoute } from "./routes/soap-route";
 
 export class App {
@@ -15,6 +16,7 @@ export class App {
 
     constructor() {
         const userRoute = new UserRoute();
+        const broadcastRoute = new BroadcastRoute();
         const soapRoute = new SoapRoute();
 
         this.dataSource = new DataSource(dataConfig);
@@ -27,6 +29,7 @@ export class App {
             express.urlencoded({ extended: true }),
             morgan("combined"),
             userRoute.getRoute(),
+            broadcastRoute.getRoute(),
             soapRoute.getRoute()
         );
     }
