@@ -17,5 +17,6 @@ export class BroadcastRoute {
             .post("/broadcast", this.broadcastController.addBroadcast())
             .get("/broadcast", this.broadcastController.getBroadcast())
             .put("/broadcast", this.broadcastController.updateBroadcast())
+            .delete("/broadcast/:id", this.broadcastController.deleteBroadcast())
     }
 }

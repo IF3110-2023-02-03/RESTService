@@ -76,4 +76,30 @@ export class BroadcastController {
             });
         };
     }
+
+    deleteBroadcast() {
+        return async (req: Request, res: Response) => {
+            this.userController.check();
+            const objectID = req.params['id'];
+
+            console.log(objectID);
+
+            const status = await Broadcast.createQueryBuilder("broadcast")
+                    .delete()
+                    .from(Broadcast)
+                    .where({ objectID: objectID })
+                    .execute()
+
+            if (!status) {
+                res.status(StatusCodes.BAD_REQUEST).json({
+                    message: ReasonPhrases.BAD_REQUEST,
+                });
+                return;
+            }
+
+            res.status(StatusCodes.OK).json({
+                message: ReasonPhrases.OK,
+            });
+        };
+    }
 }
