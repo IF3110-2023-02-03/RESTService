@@ -204,4 +204,28 @@ export class UserController {
             });
         };
     }
+
+    updateBroadcast() {
+        return async (req: Request, res: Response) => {
+            this.check();
+            const { description, objectID } = req.body;
+
+            const status = await Broadcast.createQueryBuilder("broadcast")
+                    .update(Broadcast)
+                    .set({ description: description })
+                    .where("objectID = :id", { id: objectID})
+                    .execute()
+
+            if (!status) {
+                res.status(StatusCodes.BAD_REQUEST).json({
+                    message: ReasonPhrases.BAD_REQUEST,
+                });
+                return;
+            }
+
+            res.status(StatusCodes.OK).json({
+                message: ReasonPhrases.OK,
+            });
+        };
+    }
 }
