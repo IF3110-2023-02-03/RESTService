@@ -181,7 +181,7 @@ export class SoapController {
           xml["S:Envelope"]["S:Body"][0]["ns2:getFollowersByIDResponse"][0]
             .return[0];
 
-        if (!results) {
+        if (!!results) {
           res.status(StatusCodes.OK).json({
             message: ReasonPhrases.OK,
             data: JSON.parse(results),
@@ -232,10 +232,9 @@ export class SoapController {
         );
         const xml = await xml2js.parseStringPromise(response.data);
         const results =
-          xml["S:Envelope"]["S:Body"][0]["ns2:getFollowersByIDResponse"][0]
+          xml["S:Envelope"]["S:Body"][0]["ns2:getPendingFollowingsByIDResponse"][0]
             .return[0];
-
-        if (!results) {
+        if (!!results) {
           res.status(StatusCodes.OK).json({
             message: ReasonPhrases.OK,
             data: JSON.parse(results),
