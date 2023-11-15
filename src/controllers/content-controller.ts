@@ -2,6 +2,7 @@ import { ReasonPhrases, StatusCodes } from "http-status-codes";
 import { Request, Response } from "express";
 import multer from "multer";
 import { v4 } from "uuid";
+import { unlink } from "fs";
 
 import { UserController } from "./user-controller";
 
@@ -108,7 +109,7 @@ export class ContentController {
             const objectID = req.params['id'];
             const { description } = req.body;
 
-            const status = await Objects.createQueryBuilder("broadcast")
+            const status = await Objects.createQueryBuilder("objects")
                     .update(Objects)
                     .set({ description: description })
                     .where("objectID = :id", { id: objectID})
@@ -153,5 +154,19 @@ export class ContentController {
         };
     }
 
-    
+    deleteSource() {
+        return async (req: Request, res: Response) => {
+            this.userController.check();
+
+            const name = req.params['name'];
+            let filepath =  path.join(__dirname, '..', '..', 'storage', 'objects') + '/' + name;
+
+            unlink(filepath, function () {
+                res.status(StatusCodes.OK).json({
+                    message: ReasonPhrases.OK,
+                });
+            });
+            
+        };
+    }
 }
