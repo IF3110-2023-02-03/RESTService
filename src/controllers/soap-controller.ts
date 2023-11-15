@@ -5,6 +5,7 @@ import { AuthRequest } from "../middlewares/authentication-middleware";
 import { soapConfig } from "../config/soap-config";
 import axios from "axios";
 import xml2js from "xml2js";
+import { Objects } from "../models/object-model";
 
 interface FollowRequest {
   creatorID: number;
@@ -247,6 +248,24 @@ export class SoapController {
         });
         return;
       }
+    };
+  }
+
+  contents(){
+    return async (req: Request, res: Response) => {
+      const limit = req.body.perpage;
+      const offset = (req.body.page-1)*limit;
+      const objects = await Objects.createQueryBuilder("objects")
+          .select()
+          .where("objects.userUserID IN (:...ids)", { ids: req.body.ids })
+          .limit(limit)
+          .offset(offset)
+          .getMany()
+
+      res.status(StatusCodes.OK).json({
+          message: ReasonPhrases.OK,
+          data: objects
+      });
     };
   }
 }
