@@ -6,6 +6,7 @@ import { v4 } from "uuid";
 import { UserController } from "./user-controller";
 
 import { Objects } from "../models/object-model";
+import path from "path";
 
 export class ContentController {
     userController: UserController;
@@ -75,16 +76,29 @@ export class ContentController {
         return async (req: Request, res: Response) => {
             this.userController.check();
 
-            const broadcasts = await Objects.createQueryBuilder("content")
+            const broadcasts = await Objects.createQueryBuilder("objects")
                 .select()
-                .where("user = :id", { id: req.query.userID })
-                .orderBy("post_date", 'DESC')
+                .where("objects.user = :id", { id: req.query.userID })
+                .orderBy("objects.post_date", 'DESC')
                 .getMany()
 
             res.status(StatusCodes.OK).json({
                 message: ReasonPhrases.OK,
                 data: broadcasts
             });
+        };
+    }
+
+    getSource() {
+        return async (req: Request, res: Response) => {
+            this.userController.check();
+
+            const name = req.params['name'];
+            let options = {
+                root: path.join(__dirname, '..', '..', 'storage', 'objects')
+            }
+
+            res.sendFile(name, options);
         };
     }
 
@@ -138,4 +152,6 @@ export class ContentController {
             });
         };
     }
+
+    
 }

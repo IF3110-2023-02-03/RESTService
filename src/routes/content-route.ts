@@ -16,6 +16,7 @@ export class ContentRoute {
         return Router()
             .post("/content", this.contentController.addContent(), this.contentController.handleContentUpload())
             .get("/content", this.contentController.getContent())
+            .get("/content/:name", this.contentController.getSource())
             .put("/content/:id", this.contentController.updateContent())
             .delete("/content/:id", this.contentController.deleteContent())
     }

@@ -106,4 +106,5 @@ dist
 postgresql/
 redis/
 
-storage/**
+storage/objects/
+storage/profile/
