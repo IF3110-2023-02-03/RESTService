@@ -177,13 +177,17 @@ export class UserController {
 
     index() {
         return async (req: Request, res: Response) => {
-
+            const limit = parseInt(req.query.perpage as string)
+            const offset = (parseInt(req.query.page as string) - 1)*limit
             const users = await User.createQueryBuilder("user")
-                .select(["user.userID", "user.fullname"])
+                .select(["user.userID", "user.fullname", "user.username", "user.description", "user.pp_url" ])
+                .where(`fullname like '%${req.query.filter || req.query.filter?.toString()}%' or username like '%${req.query.filter || req.query.filter?.toString()}%'`)
                 .cache(
                     `creator`,
                     cacheConfig.cacheExpirationTime
                 )
+                .limit(limit)
+                .offset(offset)
                 .getMany()
 
             res.status(StatusCodes.OK).json({

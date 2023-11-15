@@ -5,6 +5,8 @@ import { AuthRequest } from "../middlewares/authentication-middleware";
 import { soapConfig } from "../config/soap-config";
 import axios from "axios";
 import xml2js from "xml2js";
+import { Objects } from "../models/object-model";
+import { Broadcast } from "../models/broadcast-model";
 
 interface FollowRequest {
   creatorID: number;
@@ -181,7 +183,7 @@ export class SoapController {
           xml["S:Envelope"]["S:Body"][0]["ns2:getFollowersByIDResponse"][0]
             .return[0];
 
-        if (!results) {
+        if (!!results) {
           res.status(StatusCodes.OK).json({
             message: ReasonPhrases.OK,
             data: JSON.parse(results),
@@ -232,10 +234,9 @@ export class SoapController {
         );
         const xml = await xml2js.parseStringPromise(response.data);
         const results =
-          xml["S:Envelope"]["S:Body"][0]["ns2:getFollowersByIDResponse"][0]
+          xml["S:Envelope"]["S:Body"][0]["ns2:getPendingFollowingsByIDResponse"][0]
             .return[0];
-
-        if (!results) {
+        if (!!results) {
           res.status(StatusCodes.OK).json({
             message: ReasonPhrases.OK,
             data: JSON.parse(results),
@@ -248,6 +249,39 @@ export class SoapController {
         });
         return;
       }
+    };
+  }
+
+  contents(){
+    return async (req: Request, res: Response) => {
+      const limit = req.body.perpage;
+      const offset = (req.body.page-1)*limit;
+      if(req.body.ids.length > 0){
+        const objects = await Objects.createQueryBuilder("objects")
+            .select()
+            .where("objects.userUserID IN (:...ids)", { ids: req.body.ids })
+            .limit(limit)
+            .offset(offset)
+            .getMany()
+  
+        const broadcasts = await Broadcast.createQueryBuilder("broadcast")
+            .select()
+            .where("broadcast.userUserID IN (:...ids)", { ids: req.body.ids })
+            .orderBy("broadcast.post_date", 'DESC')
+            .limit(limit)
+            .offset(offset)
+            .getMany()
+        res.status(StatusCodes.OK).json({
+            message: ReasonPhrases.OK,
+            data: {objects,broadcasts}
+        });
+      }else{
+        res.status(StatusCodes.OK).json({
+          message: ReasonPhrases.OK,
+          data: {objects: [],broadcasts: []}
+        });
+      }
+
     };
   }
 }

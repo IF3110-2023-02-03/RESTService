@@ -33,5 +33,9 @@ export class SoapRoute {
                 this.authenticationMiddleware.authenticate(),
                 this.soapController.indexPending()
             )
+            .post(
+                "/contents",
+                this.soapController.contents()
+            )
     }
 }
