@@ -30,9 +30,6 @@ export class Objects extends BaseEntity {
   @Column({ nullable: true })
   url: string;
 
-  @Column("date")
-  date: string;
-
   @Column({ type: "timestamp" })
   post_date: Date;
 

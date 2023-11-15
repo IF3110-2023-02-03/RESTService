@@ -5,18 +5,18 @@ import { ContentController } from "../controllers/content-controller";
 
 export class ContentRoute {
     authenticationMiddleware: AuthenticationMiddleware;
-    broadcastController: ContentController;
+    contentController: ContentController;
 
     constructor() {
         this.authenticationMiddleware = new AuthenticationMiddleware();
-        this.broadcastController = new ContentController();
+        this.contentController = new ContentController();
     }
 
     getRoute() {
         return Router()
-            .post("/content", this.broadcastController.addBroadcast())
-            .get("/content", this.broadcastController.getContent())
-            .put("/content/:id", this.broadcastController.updateBroadcast())
-            .delete("/content/:id", this.broadcastController.deleteBroadcast())
+            .post("/content", this.contentController.addContent(), this.contentController.handleContentUpload())
+            .get("/content", this.contentController.getContent())
+            .put("/content/:id", this.contentController.updateContent())
+            .delete("/content/:id", this.contentController.deleteContent())
     }
 }
