@@ -28,6 +28,7 @@ interface UpdateRequest {
     username: string;
     fullname: string;
     description: string;
+    pp_url: string;
 }
 
 export class UserController {
@@ -140,18 +141,14 @@ export class UserController {
 
     update() {
         return async (req: Request, res: Response) => {
-            const { userID, username, fullname, description }: UpdateRequest = req.body;
-            if (!userID || !username || !fullname || !description) {
-                res.status(StatusCodes.BAD_REQUEST).json({
-                    message: ReasonPhrases.BAD_REQUEST,
-                });
-                return;
-            }
+            const { userID, username, fullname, description, pp_url }: UpdateRequest = req.body;
 
-            // Cek apakah username data sudah ada ...
-            const existingUserWithUsername = await User.findOneBy({
-                username,
-            });
+            // Cek apakah username data sudah ada selain userID pada req body ...
+            const existingUserWithUsername = await User.createQueryBuilder("user")
+                .select(["user.userID", "user.username"])
+                .where("user.username = :username", { username })
+                .andWhere("user.userID != :id", { id: userID })
+                .getOne();
             if (existingUserWithUsername) {
                 res.status(StatusCodes.BAD_REQUEST).json({
                     message: "Username already taken!",
@@ -161,7 +158,7 @@ export class UserController {
 
             const status = await User.createQueryBuilder("user")
                     .update(User)
-                    .set({ username: username, fullname: fullname, description: description })
+                    .set({ username: username, fullname: fullname, description: description, pp_url: pp_url })
                     .where("userID = :id", { id: userID})
                     .execute()
 

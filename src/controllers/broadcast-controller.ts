@@ -56,7 +56,8 @@ export class BroadcastController {
     updateBroadcast() {
         return async (req: Request, res: Response) => {
             this.userController.check();
-            const { description, objectID } = req.body;
+            const objectID = req.params['id'];
+            const { description } = req.body;
 
             const status = await Broadcast.createQueryBuilder("broadcast")
                     .update(Broadcast)

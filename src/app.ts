@@ -9,6 +9,7 @@ import { dataConfig } from "./config/data-config";
 import { UserRoute } from "./routes/user-route";
 import { BroadcastRoute } from "./routes/broadcast-route";
 import { SoapRoute } from "./routes/soap-route";
+import { ContentRoute } from "./routes/content-route";
 
 export class App {
     dataSource: DataSource;
@@ -18,6 +19,7 @@ export class App {
         const userRoute = new UserRoute();
         const broadcastRoute = new BroadcastRoute();
         const soapRoute = new SoapRoute();
+        const contentRoute = new ContentRoute();
 
         this.dataSource = new DataSource(dataConfig);
 
@@ -30,7 +32,8 @@ export class App {
             morgan("combined"),
             userRoute.getRoute(),
             broadcastRoute.getRoute(),
-            soapRoute.getRoute()
+            soapRoute.getRoute(),
+            contentRoute.getRoute()
         );
     }
 
