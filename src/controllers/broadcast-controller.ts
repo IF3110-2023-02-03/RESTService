@@ -74,6 +74,43 @@ export class BroadcastController {
         };
     }
 
+    addComment() {
+        return async (req: Request, res: Response) => {
+            const objectID = req.params['id'];
+            const { user, message } = req.body;
+
+            const item = await Broadcast.createQueryBuilder("broadcast")
+                .select()
+                .where("broadcast.objectID = :id", { id: objectID })
+                .getOne()
+
+            if (!item) {
+                res.status(StatusCodes.BAD_REQUEST).json({
+                    message: ReasonPhrases.BAD_REQUEST,
+                });
+                return;
+            }
+
+            const newComment = new Comment()
+            newComment.bc = item;
+            newComment.type = 'Broadcast';
+            newComment.user = user;
+            newComment.message = message;
+
+            const status = await newComment.save();
+            if (!status) {
+                res.status(StatusCodes.BAD_REQUEST).json({
+                    message: ReasonPhrases.BAD_REQUEST,
+                });
+                return;
+            }
+
+            res.status(StatusCodes.CREATED).json({
+                message: ReasonPhrases.CREATED,
+            });
+        };
+    }
+
     getBroadcast() {
         return async (req: Request, res: Response) => {
             this.userController.check();
@@ -263,6 +300,23 @@ export class BroadcastController {
             const objects = await Comment.createQueryBuilder("comment")
                 .select()
                 .where("comment.bc = :id AND comment.type = 'Broadcast'", { id: objectID })
+                .getMany(); 
+
+            res.status(StatusCodes.OK).json({
+                message: ReasonPhrases.OK,
+                data: objects
+            });
+        };
+    }
+
+    getCommentUser() {
+        return async (req: Request, res: Response) => {
+            this.userController.check();
+            const { user, id } = req.query;
+
+            const objects = await Comment.createQueryBuilder("comment")
+                .select()
+                .where("comment.bc = :id AND comment.type='Broadcast'", { id: parseInt(String(id)), username: user })
                 .getMany(); 
 
             res.status(StatusCodes.OK).json({

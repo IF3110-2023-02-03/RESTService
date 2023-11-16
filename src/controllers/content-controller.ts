@@ -335,4 +335,60 @@ export class ContentController {
             });
         };
     }
+
+    getCommentUser() {
+        return async (req: Request, res: Response) => {
+            this.userController.check();
+            const { user, id } = req.query;
+
+            console.log(id);
+
+            const objects = await Comment.createQueryBuilder("comment")
+                .select()
+                .where("comment.object = :id AND comment.type='Objects'", { id: parseInt(String(id))})
+                .getMany(); 
+
+            res.status(StatusCodes.OK).json({
+                message: ReasonPhrases.OK,
+                data: objects
+            });
+        };
+    }
+
+    addComment() {
+        return async (req: Request, res: Response) => {
+            const objectID = req.params['id'];
+            const { user, message } = req.body;
+
+            const item = await Objects.createQueryBuilder("objects")
+                .select()
+                .where("objects.objectID = :id", { id: objectID })
+                .getOne()
+
+            if (!item) {
+                res.status(StatusCodes.BAD_REQUEST).json({
+                    message: ReasonPhrases.BAD_REQUEST,
+                });
+                return;
+            }
+
+            const newComment = new Comment()
+            newComment.object = item;
+            newComment.type = 'Objects';
+            newComment.user = user;
+            newComment.message = message;
+
+            const status = await newComment.save();
+            if (!status) {
+                res.status(StatusCodes.BAD_REQUEST).json({
+                    message: ReasonPhrases.BAD_REQUEST,
+                });
+                return;
+            }
+
+            res.status(StatusCodes.CREATED).json({
+                message: ReasonPhrases.CREATED,
+            });
+        };
+    }
 }
