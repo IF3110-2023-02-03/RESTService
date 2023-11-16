@@ -91,6 +91,87 @@ export class ContentController {
         };
     }
 
+    addLike() {
+        return async (req: Request, res: Response) => {
+            const objectID = req.params['id'];
+            const { user } = req.body;
+
+            console.log(req.body);
+            const item = await Objects.createQueryBuilder("objects")
+                .select()
+                .where("objects.objectID = :id", { id: objectID })
+                .getOne()
+
+            if (!item) {
+                res.status(StatusCodes.BAD_REQUEST).json({
+                    message: ReasonPhrases.BAD_REQUEST,
+                });
+                return;
+            }
+
+            const newLike = new Like()
+            newLike.object = item;
+            newLike.type = 'Objects';
+            newLike.user = user;
+
+            const status = await newLike.save();
+            if (!status) {
+                res.status(StatusCodes.BAD_REQUEST).json({
+                    message: ReasonPhrases.BAD_REQUEST,
+                });
+                return;
+            }
+
+            res.status(StatusCodes.CREATED).json({
+                message: ReasonPhrases.CREATED,
+            });
+        };
+    }
+
+    isLiked() {
+        return async (req: Request, res: Response) => {
+            this.userController.check();
+            const { user, id } = req.query;
+
+            const objects = await Like.createQueryBuilder("like")
+                .select()
+                .where("like.object = :id AND like.user = :username AND like.type='Objects'", { id: parseInt(String(id)), username: user })
+                .getOne(); 
+            
+            console.log(objects);
+
+            res.status(StatusCodes.OK).json({
+                message: ReasonPhrases.OK,
+                data: objects
+            });
+        };
+    }
+
+    deleteLike() {
+        return async (req: Request, res: Response) => {
+            this.userController.check();
+            const id = req.params['id'];
+            const user = req.params['name'];
+
+            const status1 = await Like.createQueryBuilder("like")
+                    .delete()
+                    .from(Like)
+                    .where({ object: parseInt(String(id)), user: user, type: 'Objects' })
+                    .execute()
+
+            if (!status1) {
+                res.status(StatusCodes.BAD_REQUEST).json({
+                    message: ReasonPhrases.BAD_REQUEST,
+                });
+                return;
+            }
+
+            res.status(StatusCodes.OK).json({
+                message: ReasonPhrases.OK,
+            });
+        };
+    }
+
     getSource() {
         return async (req: Request, res: Response) => {
             this.userController.check();

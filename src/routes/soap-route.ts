@@ -29,6 +29,11 @@ export class SoapRoute {
                 this.soapController.index()
             )
             .get(
+                "/follow-count",
+                this.authenticationMiddleware.authenticate(),
+                this.soapController.index()
+            )
+            .get(
                 "/pending-follow",
                 this.authenticationMiddleware.authenticate(),
                 this.soapController.indexPending()

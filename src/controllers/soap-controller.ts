@@ -120,17 +120,13 @@ export class SoapController {
           xml["S:Envelope"]["S:Body"][0]["ns2:confirmFollowResponse"][0]
             .return[0];
 
+        
         if (result === "Success") {
-          res.status(StatusCodes.NOT_FOUND).json({
-            message: result,
-          });
-          return;
-        } else if (result === "Follow rejected") {
           res.status(StatusCodes.OK).json({
             message: result,
           });
           return;
-        } else {
+        }  else {
           res.status(StatusCodes.BAD_REQUEST).json({
             message: result,
           });
