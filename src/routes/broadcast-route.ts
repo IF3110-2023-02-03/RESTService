@@ -16,6 +16,7 @@ export class BroadcastRoute {
         return Router()
             .post("/broadcast", this.broadcastController.addBroadcast())
             .get("/broadcast", this.broadcastController.getBroadcast())
+            .get("/broadcast/like/:id", this.broadcastController.getLike())
             .put("/broadcast/:id", this.broadcastController.updateBroadcast())
             .delete("/broadcast/:id", this.broadcastController.deleteBroadcast())
     }

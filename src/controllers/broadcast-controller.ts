@@ -4,6 +4,7 @@ import { Request, Response } from "express";
 import { UserController } from "./user-controller";
 
 import { Broadcast } from "../models/broadcast-model";
+import { Like } from "../models/like-model";
 
 export class BroadcastController {
     userController: UserController;
@@ -100,6 +101,23 @@ export class BroadcastController {
 
             res.status(StatusCodes.OK).json({
                 message: ReasonPhrases.OK,
+            });
+        };
+    }
+
+    getLike() {
+        return async (req: Request, res: Response) => {
+            this.userController.check();
+            const objectID = req.params['id'];
+
+            const objects = await Like.createQueryBuilder("like")
+                .select("COUNT(*)")
+                .where("like.bc = :id AND like.type = 'Broadcast'", { id: objectID })
+                .getRawOne(); 
+
+            res.status(StatusCodes.OK).json({
+                message: ReasonPhrases.OK,
+                data: objects
             });
         };
     }

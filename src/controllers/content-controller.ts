@@ -178,7 +178,7 @@ export class ContentController {
 
             const objects = await Like.createQueryBuilder("like")
                 .select("COUNT(*)")
-                .where("like.object = :id", { id: objectID })
+                .where("like.object = :id AND like.type = 'Objects'", { id: objectID })
                 .getRawOne(); 
 
             res.status(StatusCodes.OK).json({
