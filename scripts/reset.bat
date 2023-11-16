@@ -10,11 +10,10 @@ set "postgreFolderPath=%cd%\%postgreFolderName%"
 REM Check if the folder exists before attempting to delete it
 if exist "%postgreFolderPath%" (
     rmdir /s /q "%postgreFolderPath%"
-    echo PostgreSQL folder deleted successfully.
+    echo RESTService PostgreSQL folder deleted successfully.
 ) else (
-    echo PostgreSQL folder does not exist.
+    echo RESTService PostgreSQL folder does not exist.
 )
-echo.
 
 REM Delete Redis folder
 set "redisFolderName=redis"
@@ -25,13 +24,14 @@ set "redisFolderPath=%cd%\%redisFolderName%"
 REM Check if the folder exists before attempting to delete it
 if exist "%redisFolderPath%" (
     rmdir /s /q "%redisFolderPath%"
-    echo Redis folder deleted successfully.
+    echo RESTService Redis folder deleted successfully.
 ) else (
-    echo Redis folder does not exist.
+    echo RESTService Redis folder does not exist.
 )
-echo.
 
 endlocal
 
-REM Delete the Docker image with the tag "restservice-rest-api:latest"
-docker rmi restservice-rest-api:latest
+REM Delete the Docker image with the tag "spaces-rest-service:latest"
+docker rmi spaces-rest-service:latest
+
+echo.
