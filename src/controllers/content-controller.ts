@@ -5,7 +5,7 @@ import { v4 } from "uuid";
 import { unlink } from "fs";
 
 import { UserController } from "./user-controller";
-
+import { Comment } from "../models/comment-model";
 import { Objects } from "../models/object-model";
 import { Like } from "../models/like-model";
 import path from "path";
@@ -134,6 +134,19 @@ export class ContentController {
             this.userController.check();
             const objectID = req.params['id'];
 
+            const status0 = await Comment.createQueryBuilder("like")
+                    .delete()
+                    .from(Comment)
+                    .where({ object: objectID })
+                    .execute()
+
+            if (!status0) {
+                res.status(StatusCodes.BAD_REQUEST).json({
+                    message: ReasonPhrases.BAD_REQUEST,
+                });
+                return;
+            }
+
             const status1 = await Like.createQueryBuilder("like")
                     .delete()
                     .from(Like)
@@ -182,6 +195,32 @@ export class ContentController {
         };
     }
 
+    deleteComment() {
+        return async (req: Request, res: Response) => {
+            this.userController.check();
+            const objectID = req.params['id'];
+
+            console.log(objectID);
+
+            const status1 = await Comment.createQueryBuilder("comment")
+                    .delete()
+                    .from(Comment)
+                    .where({ commentID: objectID })
+                    .execute()
+
+            if (!status1) {
+                res.status(StatusCodes.BAD_REQUEST).json({
+                    message: ReasonPhrases.BAD_REQUEST,
+                });
+                return;
+            }
+
+            res.status(StatusCodes.OK).json({
+                message: ReasonPhrases.OK,
+            });
+        };
+    }
+
     getLike() {
         return async (req: Request, res: Response) => {
             this.userController.check();
@@ -191,6 +230,23 @@ export class ContentController {
                 .select("COUNT(*)")
                 .where("like.object = :id AND like.type = 'Objects'", { id: objectID })
                 .getRawOne(); 
+
+            res.status(StatusCodes.OK).json({
+                message: ReasonPhrases.OK,
+                data: objects
+            });
+        };
+    }
+
+    getComment() {
+        return async (req: Request, res: Response) => {
+            this.userController.check();
+            const objectID = req.params['id'];
+
+            const objects = await Comment.createQueryBuilder("comment")
+                .select()
+                .where("comment.object = :id AND comment.type = 'Objects'", { id: objectID })
+                .getMany(); 
 
             res.status(StatusCodes.OK).json({
                 message: ReasonPhrases.OK,

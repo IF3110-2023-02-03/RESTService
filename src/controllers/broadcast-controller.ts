@@ -2,7 +2,7 @@ import { ReasonPhrases, StatusCodes } from "http-status-codes";
 import { Request, Response } from "express";
 
 import { UserController } from "./user-controller";
-
+import { Comment } from "../models/comment-model";
 import { Broadcast } from "../models/broadcast-model";
 import { Like } from "../models/like-model";
 
@@ -86,6 +86,19 @@ export class BroadcastController {
 
             console.log(objectID);
 
+            const status0 = await Comment.createQueryBuilder("like")
+                    .delete()
+                    .from(Comment)
+                    .where({ bc: objectID })
+                    .execute()
+
+            if (!status0) {
+                res.status(StatusCodes.BAD_REQUEST).json({
+                    message: ReasonPhrases.BAD_REQUEST,
+                });
+                return;
+            }
+
             const status1 = await Like.createQueryBuilder("like")
                     .delete()
                     .from(Like)
@@ -99,13 +112,39 @@ export class BroadcastController {
                 return;
             }
 
-            const status = await Broadcast.createQueryBuilder("broadcast")
+            const status2 = await Broadcast.createQueryBuilder("broadcast")
                     .delete()
                     .from(Broadcast)
                     .where({ objectID: objectID })
                     .execute()
 
-            if (!status) {
+            if (!status2) {
+                res.status(StatusCodes.BAD_REQUEST).json({
+                    message: ReasonPhrases.BAD_REQUEST,
+                });
+                return;
+            }
+
+            res.status(StatusCodes.OK).json({
+                message: ReasonPhrases.OK,
+            });
+        };
+    }
+
+    deleteComment() {
+        return async (req: Request, res: Response) => {
+            this.userController.check();
+            const objectID = req.params['id'];
+
+            console.log(objectID);
+
+            const status1 = await Comment.createQueryBuilder("comment")
+                    .delete()
+                    .from(Comment)
+                    .where({ commentID: objectID })
+                    .execute()
+
+            if (!status1) {
                 res.status(StatusCodes.BAD_REQUEST).json({
                     message: ReasonPhrases.BAD_REQUEST,
                 });
@@ -127,6 +166,23 @@ export class BroadcastController {
                 .select("COUNT(*)")
                 .where("like.bc = :id AND like.type = 'Broadcast'", { id: objectID })
                 .getRawOne(); 
+
+            res.status(StatusCodes.OK).json({
+                message: ReasonPhrases.OK,
+                data: objects
+            });
+        };
+    }
+
+    getComment() {
+        return async (req: Request, res: Response) => {
+            this.userController.check();
+            const objectID = req.params['id'];
+
+            const objects = await Comment.createQueryBuilder("comment")
+                .select()
+                .where("comment.bc = :id AND comment.type = 'Broadcast'", { id: objectID })
+                .getMany(); 
 
             res.status(StatusCodes.OK).json({
                 message: ReasonPhrases.OK,

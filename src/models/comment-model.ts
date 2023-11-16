@@ -1,5 +1,4 @@
 import { BaseEntity, Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { User } from "./user-model";
 import { Objects } from "./object-model";
 import { Broadcast } from "./broadcast-model";
 
@@ -20,8 +19,8 @@ export class Comment extends BaseEntity {
   @ManyToOne(() => Broadcast, (bc) => bc.comments)
   bc: Broadcast;
 
-  @ManyToOne(() => User, (user) => user.comments)
-  user: User;
+  @Column()
+  user: string;
 
   @Column()
   message: string;
