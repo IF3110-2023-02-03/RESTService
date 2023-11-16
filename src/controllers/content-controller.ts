@@ -2,10 +2,13 @@ import { ReasonPhrases, StatusCodes } from "http-status-codes";
 import { Request, Response } from "express";
 import multer from "multer";
 import { v4 } from "uuid";
+import { unlink } from "fs";
 
 import { UserController } from "./user-controller";
-
+import { Comment } from "../models/comment-model";
 import { Objects } from "../models/object-model";
+import { Like } from "../models/like-model";
+import path from "path";
 
 export class ContentController {
     userController: UserController;
@@ -75,10 +78,10 @@ export class ContentController {
         return async (req: Request, res: Response) => {
             this.userController.check();
 
-            const broadcasts = await Objects.createQueryBuilder("content")
+            const broadcasts = await Objects.createQueryBuilder("objects")
                 .select()
-                .where("user = :id", { id: req.query.userID })
-                .orderBy("post_date", 'DESC')
+                .where("objects.user = :id", { id: req.query.userID })
+                .orderBy("objects.post_date", 'DESC')
                 .getMany()
 
             res.status(StatusCodes.OK).json({
@@ -88,13 +91,26 @@ export class ContentController {
         };
     }
 
+    getSource() {
+        return async (req: Request, res: Response) => {
+            this.userController.check();
+
+            const name = req.params['name'];
+            let options = {
+                root: path.join(__dirname, '..', '..', 'storage', 'objects')
+            }
+
+            res.sendFile(name, options);
+        };
+    }
+
     updateContent() {
         return async (req: Request, res: Response) => {
             this.userController.check();
             const objectID = req.params['id'];
             const { description } = req.body;
 
-            const status = await Objects.createQueryBuilder("broadcast")
+            const status = await Objects.createQueryBuilder("objects")
                     .update(Objects)
                     .set({ description: description })
                     .where("objectID = :id", { id: objectID})
@@ -118,15 +134,39 @@ export class ContentController {
             this.userController.check();
             const objectID = req.params['id'];
 
-            console.log(objectID);
+            const status0 = await Comment.createQueryBuilder("like")
+                    .delete()
+                    .from(Comment)
+                    .where({ object: objectID })
+                    .execute()
 
-            const status = await Objects.createQueryBuilder("broadcast")
+            if (!status0) {
+                res.status(StatusCodes.BAD_REQUEST).json({
+                    message: ReasonPhrases.BAD_REQUEST,
+                });
+                return;
+            }
+
+            const status1 = await Like.createQueryBuilder("like")
+                    .delete()
+                    .from(Like)
+                    .where({ object: objectID })
+                    .execute()
+
+            if (!status1) {
+                res.status(StatusCodes.BAD_REQUEST).json({
+                    message: ReasonPhrases.BAD_REQUEST,
+                });
+                return;
+            }
+
+            const status2 = await Objects.createQueryBuilder("broadcast")
                     .delete()
                     .from(Objects)
                     .where({ objectID: objectID })
                     .execute()
 
-            if (!status) {
+            if (!status2) {
                 res.status(StatusCodes.BAD_REQUEST).json({
                     message: ReasonPhrases.BAD_REQUEST,
                 });
@@ -135,6 +175,82 @@ export class ContentController {
 
             res.status(StatusCodes.OK).json({
                 message: ReasonPhrases.OK,
+            });
+        };
+    }
+
+    deleteSource() {
+        return async (req: Request, res: Response) => {
+            this.userController.check();
+
+            const name = req.params['name'];
+            let filepath =  path.join(__dirname, '..', '..', 'storage', 'objects') + '/' + name;
+
+            unlink(filepath, function () {
+                res.status(StatusCodes.OK).json({
+                    message: ReasonPhrases.OK,
+                });
+            });
+            
+        };
+    }
+
+    deleteComment() {
+        return async (req: Request, res: Response) => {
+            this.userController.check();
+            const objectID = req.params['id'];
+
+            console.log(objectID);
+
+            const status1 = await Comment.createQueryBuilder("comment")
+                    .delete()
+                    .from(Comment)
+                    .where({ commentID: objectID })
+                    .execute()
+
+            if (!status1) {
+                res.status(StatusCodes.BAD_REQUEST).json({
+                    message: ReasonPhrases.BAD_REQUEST,
+                });
+                return;
+            }
+
+            res.status(StatusCodes.OK).json({
+                message: ReasonPhrases.OK,
+            });
+        };
+    }
+
+    getLike() {
+        return async (req: Request, res: Response) => {
+            this.userController.check();
+            const objectID = req.params['id'];
+
+            const objects = await Like.createQueryBuilder("like")
+                .select("COUNT(*)")
+                .where("like.object = :id AND like.type = 'Objects'", { id: objectID })
+                .getRawOne(); 
+
+            res.status(StatusCodes.OK).json({
+                message: ReasonPhrases.OK,
+                data: objects
+            });
+        };
+    }
+
+    getComment() {
+        return async (req: Request, res: Response) => {
+            this.userController.check();
+            const objectID = req.params['id'];
+
+            const objects = await Comment.createQueryBuilder("comment")
+                .select()
+                .where("comment.object = :id AND comment.type = 'Objects'", { id: objectID })
+                .getMany(); 
+
+            res.status(StatusCodes.OK).json({
+                message: ReasonPhrases.OK,
+                data: objects
             });
         };
     }

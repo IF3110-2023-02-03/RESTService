@@ -16,7 +16,12 @@ export class ContentRoute {
         return Router()
             .post("/content", this.contentController.addContent(), this.contentController.handleContentUpload())
             .get("/content", this.contentController.getContent())
+            .get("/content/src/:name", this.contentController.getSource())
+            .get("/content/like/:id", this.contentController.getLike())
+            .get("/content/comment/:id", this.contentController.getComment())
             .put("/content/:id", this.contentController.updateContent())
             .delete("/content/:id", this.contentController.deleteContent())
+            .delete("/content/comment/:id", this.contentController.deleteComment())
+            .delete("/content/src/:name", this.contentController.deleteSource())
     }
 }

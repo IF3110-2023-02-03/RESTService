@@ -26,6 +26,6 @@ export class Like extends BaseEntity {
   @ManyToOne(() => Broadcast, (bc) => bc.likes)
   bc: Broadcast;
 
-  @ManyToOne(() => User, (user) => user.likes)
-  user: User;
+  @Column()
+  user: string;
 }

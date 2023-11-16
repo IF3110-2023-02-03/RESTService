@@ -2,6 +2,10 @@ import { ReasonPhrases, StatusCodes } from "http-status-codes";
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import multer from "multer";
+import { v4 } from "uuid";
+import { unlink } from "fs";
+import path from "path";
 
 import {
     AuthToken,
@@ -246,6 +250,74 @@ export class UserController {
             res.status(StatusCodes.OK).json({
                 userID: token.userID
             });
+        };
+    }
+
+    addContent() {
+        const storage = multer.diskStorage({
+          destination: function (req, file, cb) {
+            cb(null, './storage/profile/');
+          },
+          filename: function (req, file, cb) {
+            const filename = v4() + file.originalname.slice(-4); 
+            cb(null, filename);
+          },
+        });
+    
+        const upload = multer({ storage: storage });
+    
+        return upload.single('file');
+    }
+    
+    handleContentUpload() {
+        return async (req: Request, res: Response) => {
+            try {
+                this.check();
+          
+                const { userID, previousPath } = req.body;
+          
+                const filename = req.file?.filename;
+
+                let filepath =  path.join(__dirname, '..', '..', 'storage', 'profile') + '/' + previousPath;
+
+                unlink(filepath, (err => { if (err) console.log(err)}));
+
+                const status = await User.createQueryBuilder("user")
+                    .update(User)
+                    .set({ pp_url: filename } )
+                    .where("userID = :id", { id: userID})
+                    .execute()
+          
+                if (!status) {
+                  return res.status(StatusCodes.BAD_REQUEST).json({
+                    message: ReasonPhrases.BAD_REQUEST,
+                  });
+                }
+                
+                res.status(StatusCodes.CREATED).json({
+                    message: ReasonPhrases.CREATED,
+                    newPath: filename
+                });
+
+              } catch (error) {
+                console.error(error);
+                return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+                  message: ReasonPhrases.INTERNAL_SERVER_ERROR,
+                });
+              }
+        };
+    }
+
+    getSource() {
+        return async (req: Request, res: Response) => {
+            this.check();
+
+            const name = req.params['name'];
+            let options = {
+                root: path.join(__dirname, '..', '..', 'storage', 'profile')
+            }
+
+            res.sendFile(name, options);
         };
     }
 }
