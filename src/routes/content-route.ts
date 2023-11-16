@@ -17,6 +17,7 @@ export class ContentRoute {
             .post("/content", this.contentController.addContent(), this.contentController.handleContentUpload())
             .get("/content", this.contentController.getContent())
             .get("/content/src/:name", this.contentController.getSource())
+            .get("/content/like/:id", this.contentController.getLike())
             .put("/content/:id", this.contentController.updateContent())
             .delete("/content/:id", this.contentController.deleteContent())
             .delete("/content/src/:name", this.contentController.deleteSource())

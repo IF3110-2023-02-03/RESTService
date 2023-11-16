@@ -7,6 +7,7 @@ import { unlink } from "fs";
 import { UserController } from "./user-controller";
 
 import { Objects } from "../models/object-model";
+import { Like } from "../models/like-model";
 import path from "path";
 
 export class ContentController {
@@ -167,6 +168,23 @@ export class ContentController {
                 });
             });
             
+        };
+    }
+
+    getLike() {
+        return async (req: Request, res: Response) => {
+            this.userController.check();
+            const objectID = req.params['id'];
+
+            const objects = await Like.createQueryBuilder("like")
+                .select("COUNT(*)")
+                .where("like.object = :id", { id: objectID })
+                .getRawOne(); 
+
+            res.status(StatusCodes.OK).json({
+                message: ReasonPhrases.OK,
+                data: objects
+            });
         };
     }
 }
