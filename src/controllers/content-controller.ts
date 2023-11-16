@@ -134,15 +134,26 @@ export class ContentController {
             this.userController.check();
             const objectID = req.params['id'];
 
-            console.log(objectID);
+            const status1 = await Like.createQueryBuilder("like")
+                    .delete()
+                    .from(Like)
+                    .where({ object: objectID })
+                    .execute()
 
-            const status = await Objects.createQueryBuilder("broadcast")
+            if (!status1) {
+                res.status(StatusCodes.BAD_REQUEST).json({
+                    message: ReasonPhrases.BAD_REQUEST,
+                });
+                return;
+            }
+
+            const status2 = await Objects.createQueryBuilder("broadcast")
                     .delete()
                     .from(Objects)
                     .where({ objectID: objectID })
                     .execute()
 
-            if (!status) {
+            if (!status2) {
                 res.status(StatusCodes.BAD_REQUEST).json({
                     message: ReasonPhrases.BAD_REQUEST,
                 });

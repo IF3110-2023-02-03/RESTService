@@ -86,6 +86,19 @@ export class BroadcastController {
 
             console.log(objectID);
 
+            const status1 = await Like.createQueryBuilder("like")
+                    .delete()
+                    .from(Like)
+                    .where({ bc: objectID })
+                    .execute()
+
+            if (!status1) {
+                res.status(StatusCodes.BAD_REQUEST).json({
+                    message: ReasonPhrases.BAD_REQUEST,
+                });
+                return;
+            }
+
             const status = await Broadcast.createQueryBuilder("broadcast")
                     .delete()
                     .from(Broadcast)
