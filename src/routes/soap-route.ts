@@ -42,5 +42,13 @@ export class SoapRoute {
                 "/contents",
                 this.soapController.contents()
             )
+            .put(
+                "/update-username",
+                this.soapController.updateUsername()
+            )
+            .put(
+                "/update-fullname",
+                this.soapController.updateFullname()
+            )
     }
 }
