@@ -6,6 +6,7 @@ import multer from "multer";
 import { v4 } from "uuid";
 import { unlink } from "fs";
 import path from "path";
+import xml2js from "xml2js";
 
 import {
     AuthToken,
@@ -14,6 +15,8 @@ import {
 import { cacheConfig } from "../config/cache-config";
 import { jwtConfig } from "../config/jwt-config";
 import { User } from "../models/user-model";
+import axios from "axios";
+import { soapConfig } from "../config/soap-config";
 
 interface TokenRequest {
     username: string;
@@ -183,13 +186,13 @@ export class UserController {
         return async (req: Request, res: Response) => {
             const limit = parseInt(req.query.perpage as string)
             const offset = (parseInt(req.query.page as string) - 1)*limit
+            let where = ''
+            if(req.query.filter && (req.query.filter as string)?.length > 0){
+                where = `fullname like '%${req.query.filter}%' or username like '%${req.query.filter}%'`;
+            }
             const users = await User.createQueryBuilder("user")
                 .select(["user.userID", "user.fullname", "user.username", "user.description", "user.pp_url" ])
-                .where(`fullname like '%${req.query.filter || req.query.filter?.toString()}%' or username like '%${req.query.filter || req.query.filter?.toString()}%'`)
-                .cache(
-                    `creator`,
-                    cacheConfig.cacheExpirationTime
-                )
+                .where(where)
                 .limit(limit)
                 .offset(offset)
                 .getMany()
@@ -318,6 +321,48 @@ export class UserController {
             }
 
             res.sendFile(name, options);
+        };
+    }
+
+    getFollowersCount(){
+        return async (req: Request, res: Response) => {
+            const { token } = req as AuthRequest;
+            if (!token) {
+                res.status(StatusCodes.UNAUTHORIZED).json({
+                message: ReasonPhrases.UNAUTHORIZED,
+                });
+                return;
+            }
+
+            try {
+                const response = await axios.post<string>(
+                `http://${soapConfig.host}:${soapConfig.port}/api/following`,
+                `<Envelope xmlns="http://schemas.xmlsoap.org/soap/envelope/">
+                    <Body>
+                        <getFollowersCountByID xmlns="http://services.example.org/">
+                            <arg0 xmlns="">${req.query.creatorID}</arg0>
+                            <arg1 xmlns="">${soapConfig.key}</arg1>
+                        </getFollowersCountByID>
+                    </Body>
+                </Envelope>`,
+                {
+                    headers: {
+                    "Content-Type": "text/xml",
+                    },
+                }
+                );
+                const xml = await xml2js.parseStringPromise(response.data);
+                const result = xml["S:Envelope"]["S:Body"][0]["ns2:getFollowersCountByIDResponse"][0]
+                    .return[0];
+                
+
+                res.status(StatusCodes.OK).json(JSON.parse(result));
+            } catch (error) {
+                res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+                message: ReasonPhrases.INTERNAL_SERVER_ERROR,
+                });
+                return;
+            }
         };
     }
 }

@@ -26,6 +26,7 @@ export class App {
         this.server = express();
         this.server.use((cors as (options: cors.CorsOptions) => express.RequestHandler)({}));
         this.server.use('/objects', express.static('storage/objects'))
+        this.server.use('/profiles', express.static('storage/profile'))
         this.server.use(
             "/api",
             express.json(),

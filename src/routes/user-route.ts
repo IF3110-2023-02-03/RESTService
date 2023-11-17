@@ -21,6 +21,9 @@ export class UserRoute {
             .get("/user", this.userController.index())
             .get("/user/profile/:name", this.userController.getSource())
             .get("/user/info", this.userController.info())
+            .get("/get-followers-count", 
+                this.authenticationMiddleware.authenticate(), 
+                this.userController.getFollowersCount())
             .get(
                 "/user/check", 
                 this.authenticationMiddleware.authenticate(),

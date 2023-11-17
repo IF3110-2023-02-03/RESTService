@@ -58,12 +58,7 @@ export class SoapController {
           xml["S:Envelope"]["S:Body"][0]["ns2:confirmFollowResponse"][0]
             .return[0];
 
-        if (result === "Follow not found") {
-          res.status(StatusCodes.NOT_FOUND).json({
-            message: result,
-          });
-          return;
-        } else if (result === "Success") {
+        if (result === "Success") {
           res.status(StatusCodes.OK).json({
             message: result,
           });
@@ -158,6 +153,8 @@ export class SoapController {
       const page = parseInt((req.query?.page || "1") as string);
       const pageSize = parseInt((req.query?.pageSize || "5") as string);
       const id = req.query?.id
+      const filter = req.query?.filter || ""
+      console.log(filter)
       let followData: FollowData[] = [];
       try {
         const response = await axios.post<string>(
@@ -168,7 +165,8 @@ export class SoapController {
                               <arg0 xmlns="">${id}</arg0>
                               <arg1 xmlns="">${page}</arg1>
                               <arg2 xmlns="">${pageSize}</arg2>
-                              <arg3 xmlns="">${soapConfig.key}</arg3>
+                              <arg3 xmlns="">${filter}</arg3>
+                              <arg4 xmlns="">${soapConfig.key}</arg4>
                             </getFollowersByID>
                         </Body>
                     </Envelope>`,
@@ -180,8 +178,9 @@ export class SoapController {
         );
         const xml = await xml2js.parseStringPromise(response.data);
         const results =
-          xml["S:Envelope"]["S:Body"][0]["ns2:getFollowersByIDResponse"][0]
-            .return[0];
+        xml["S:Envelope"]["S:Body"][0]["ns2:getFollowersByIDResponse"][0]
+        .return[0];
+        console.log(xml["S:Envelope"]["S:Body"][0]["ns2:getFollowersByIDResponse"][0])
 
         if (!!results) {
           res.status(StatusCodes.OK).json({
