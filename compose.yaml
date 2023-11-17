@@ -1,5 +1,6 @@
 services:
   rest-api:
+    image: spaces-rest-service:latest
     build: .
     ports:
       - 3000:3000
@@ -8,9 +9,6 @@ services:
     volumes:
       - ./:/app
       - /app/node_modules
-    depends_on:
-      - postgresql
-      - redis
     networks:
       - api-postgresql-redis
   postgresql:
@@ -19,9 +17,9 @@ services:
       - 5433:5432
     hostname: db-spaces-rest-service
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: spaces
     volumes:
       - ./postgresql:/var/lib/postgresql/data
     networks:

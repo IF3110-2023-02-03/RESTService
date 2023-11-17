@@ -10,6 +10,7 @@ import { UserRoute } from "./routes/user-route";
 import { BroadcastRoute } from "./routes/broadcast-route";
 import { SoapRoute } from "./routes/soap-route";
 import { ContentRoute } from "./routes/content-route";
+import { FollowerRoute } from "./routes/follower-route";
 
 export class App {
     dataSource: DataSource;
@@ -20,6 +21,7 @@ export class App {
         const broadcastRoute = new BroadcastRoute();
         const soapRoute = new SoapRoute();
         const contentRoute = new ContentRoute();
+        const followerRoute = new FollowerRoute();
 
         this.dataSource = new DataSource(dataConfig);
 
@@ -35,7 +37,8 @@ export class App {
             userRoute.getRoute(),
             broadcastRoute.getRoute(),
             soapRoute.getRoute(),
-            contentRoute.getRoute()
+            contentRoute.getRoute(),
+            followerRoute.getRoute()
         );
     }
 

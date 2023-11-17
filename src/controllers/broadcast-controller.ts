@@ -37,6 +37,80 @@ export class BroadcastController {
         };
     }
 
+    addLike() {
+        return async (req: Request, res: Response) => {
+            const objectID = req.params['id'];
+            const { user } = req.body;
+
+            console.log(req.body);
+            const bcitem = await Broadcast.createQueryBuilder("broadcast")
+                .select()
+                .where("broadcast.objectID = :id", { id: objectID })
+                .getOne()
+
+            if (!bcitem) {
+                res.status(StatusCodes.BAD_REQUEST).json({
+                    message: ReasonPhrases.BAD_REQUEST,
+                });
+                return;
+            }
+
+            const newLike = new Like()
+            newLike.bc = bcitem;
+            newLike.type = 'Broadcast';
+            newLike.user = user;
+
+            const status = await newLike.save();
+            if (!status) {
+                res.status(StatusCodes.BAD_REQUEST).json({
+                    message: ReasonPhrases.BAD_REQUEST,
+                });
+                return;
+            }
+
+            res.status(StatusCodes.CREATED).json({
+                message: ReasonPhrases.CREATED,
+            });
+        };
+    }
+
+    addComment() {
+        return async (req: Request, res: Response) => {
+            const objectID = req.params['id'];
+            const { user, message } = req.body;
+
+            const item = await Broadcast.createQueryBuilder("broadcast")
+                .select()
+                .where("broadcast.objectID = :id", { id: objectID })
+                .getOne()
+
+            if (!item) {
+                res.status(StatusCodes.BAD_REQUEST).json({
+                    message: ReasonPhrases.BAD_REQUEST,
+                });
+                return;
+            }
+
+            const newComment = new Comment()
+            newComment.bc = item;
+            newComment.type = 'Broadcast';
+            newComment.user = user;
+            newComment.message = message;
+
+            const status = await newComment.save();
+            if (!status) {
+                res.status(StatusCodes.BAD_REQUEST).json({
+                    message: ReasonPhrases.BAD_REQUEST,
+                });
+                return;
+            }
+
+            res.status(StatusCodes.CREATED).json({
+                message: ReasonPhrases.CREATED,
+            });
+        };
+    }
+
     getBroadcast() {
         return async (req: Request, res: Response) => {
             this.userController.check();
@@ -157,6 +231,31 @@ export class BroadcastController {
         };
     }
 
+    deleteLike() {
+        return async (req: Request, res: Response) => {
+            this.userController.check();
+            const id = req.params['id'];
+            const user = req.params['name'];
+
+            const status1 = await Like.createQueryBuilder("like")
+                    .delete()
+                    .from(Like)
+                    .where({ bc: parseInt(String(id)), user: user, type: 'Broadcast' })
+                    .execute()
+
+            if (!status1) {
+                res.status(StatusCodes.BAD_REQUEST).json({
+                    message: ReasonPhrases.BAD_REQUEST,
+                });
+                return;
+            }
+
+            res.status(StatusCodes.OK).json({
+                message: ReasonPhrases.OK,
+            });
+        };
+    }
+
     getLike() {
         return async (req: Request, res: Response) => {
             this.userController.check();
@@ -174,6 +273,25 @@ export class BroadcastController {
         };
     }
 
+    isLiked() {
+        return async (req: Request, res: Response) => {
+            this.userController.check();
+            const { user, id } = req.query;
+
+            const objects = await Like.createQueryBuilder("like")
+                .select()
+                .where("like.bc = :id AND like.user = :username AND like.type='Broadcast'", { id: parseInt(String(id)), username: user })
+                .getOne(); 
+            
+            console.log(objects);
+
+            res.status(StatusCodes.OK).json({
+                message: ReasonPhrases.OK,
+                data: objects
+            });
+        };
+    }
+
     getComment() {
         return async (req: Request, res: Response) => {
             this.userController.check();
@@ -182,6 +300,23 @@ export class BroadcastController {
             const objects = await Comment.createQueryBuilder("comment")
                 .select()
                 .where("comment.bc = :id AND comment.type = 'Broadcast'", { id: objectID })
+                .getMany(); 
+
+            res.status(StatusCodes.OK).json({
+                message: ReasonPhrases.OK,
+                data: objects
+            });
+        };
+    }
+
+    getCommentUser() {
+        return async (req: Request, res: Response) => {
+            this.userController.check();
+            const { user, id } = req.query;
+
+            const objects = await Comment.createQueryBuilder("comment")
+                .select()
+                .where("comment.bc = :id AND comment.type='Broadcast'", { id: parseInt(String(id)), username: user })
                 .getMany(); 
 
             res.status(StatusCodes.OK).json({

@@ -15,13 +15,18 @@ export class ContentRoute {
     getRoute() {
         return Router()
             .post("/content", this.contentController.addContent(), this.contentController.handleContentUpload())
+            .post("/content/like/:id", this.contentController.addLike())
+            .post("/content/comment/:id", this.contentController.addComment())
             .get("/content", this.contentController.getContent())
             .get("/content/src/:name", this.contentController.getSource())
             .get("/content/like/:id", this.contentController.getLike())
+            .get("/content/like", this.contentController.isLiked())
             .get("/content/comment/:id", this.contentController.getComment())
+            .get("/content/comment", this.contentController.getCommentUser())
             .put("/content/:id", this.contentController.updateContent())
             .delete("/content/:id", this.contentController.deleteContent())
             .delete("/content/comment/:id", this.contentController.deleteComment())
+            .delete("/content/like/:id/:name", this.contentController.deleteLike())
             .delete("/content/src/:name", this.contentController.deleteSource())
     }
 }
