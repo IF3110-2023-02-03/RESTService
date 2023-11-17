@@ -105,6 +105,3 @@ dist
 # Docker
 postgresql/
 redis/
-
-storage/objects/
-storage/profile/
