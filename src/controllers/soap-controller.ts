@@ -160,7 +160,7 @@ export class SoapController {
                             <getFollowersByID xmlns="http://services.example.org/">
                               <arg0 xmlns="">${id}</arg0>
                               <arg1 xmlns="">${page}</arg1>
-                              <arg2 xmlns="">${pageSize}</arg2>
+                              <arg2 xmlns="">10000</arg2>
                               <arg3 xmlns="">${filter}</arg3>
                               <arg4 xmlns="">${soapConfig.key}</arg4>
                             </getFollowersByID>
@@ -216,7 +216,7 @@ export class SoapController {
                   <getPendingFollowingsByID xmlns="http://services.example.org/">
                       <arg0 xmlns="">${id}</arg0>
                       <arg1 xmlns="">${page}</arg1>
-                      <arg2 xmlns="">${pageSize}</arg2>
+                      <arg2 xmlns="">10000</arg2>
                       <arg3 xmlns="">${soapConfig.key}</arg3>
                   </getPendingFollowingsByID>
               </Body>
