@@ -279,4 +279,64 @@ export class SoapController {
 
     };
   }
+
+  updateUsername() {
+    return async (req: Request, res: Response) => {
+      const { oldUsername, newUsername } = req.body;
+      try {
+        await axios.post<string>(
+          `http://${soapConfig.host}:${soapConfig.port}/api/following`,
+          `<Envelope xmlns="http://schemas.xmlsoap.org/soap/envelope/">
+              <Body>
+                  <updateCreatorUsername xmlns="http://services.example.org/">
+                      <arg0 xmlns="">${oldUsername}</arg0>
+                      <arg1 xmlns="">${newUsername}</arg1>
+                      <arg2 xmlns="">${soapConfig.key}</arg2>
+                  </updateCreatorUsername>
+              </Body>
+          </Envelope>`,
+          {
+            headers: {
+              "Content-Type": "text/xml",
+            },
+          }
+        );
+      } catch (error) {
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+          message: ReasonPhrases.INTERNAL_SERVER_ERROR,
+        });
+        return;
+      }
+    };
+  }
+
+  updateFullname() {
+    return async (req: Request, res: Response) => {
+      const { oldFullname, newFullname } = req.body;
+      try {
+        await axios.post<string>(
+          `http://${soapConfig.host}:${soapConfig.port}/api/following`,
+          `<Envelope xmlns="http://schemas.xmlsoap.org/soap/envelope/">
+              <Body>
+                  <updateCreatorName xmlns="http://services.example.org/">
+                      <arg0 xmlns="">${oldFullname}</arg0>
+                      <arg1 xmlns="">${newFullname}</arg1>
+                      <arg2 xmlns="">${soapConfig.key}</arg2>
+                  </updateCreatorName>
+              </Body>
+          </Envelope>`,
+          {
+            headers: {
+              "Content-Type": "text/xml",
+            },
+          }
+        );
+      } catch (error) {
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+          message: ReasonPhrases.INTERNAL_SERVER_ERROR,
+        });
+        return;
+      }
+    };
+  }
 }
